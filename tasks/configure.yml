@@ -1,0 +1,80 @@
+# tasks file for ubuntu-1604-mariadb-replication
+---
+- name: configure | check service
+  service:
+    name: mysql
+    state: started
+
+- name: configure | create replication user
+  mysql_user:
+    name: "{{ ubuntu_1604_mariadb_replication_user_name }}"
+    host: '%'
+    password: "{{ ubuntu_1604_mariadb_replication_user_password }}"
+    priv: '*.*:REPLICATION SLAVE,REPLICATION CLIENT'
+    state: present
+
+- name: configure | copy configuration file
+  template:
+    src: "etc/mysql/mariadb.conf.d/replication.cnf.j2"
+    dest: "/etc/mysql/mariadb.conf.d/70-replication.cnf"
+  notify: restart mariadb-server
+
+- name: configure | get slave on master2
+  mysql_replication:
+    mode: getslave
+  register: slave2_information
+  when: inventory_hostname in ubuntu_1604_mariadb_replication_master2_host
+
+- name: configure | change master on master2
+  mysql_replication:
+    mode: changemaster
+    master_host: "{{ ubuntu_1604_mariadb_replication_master1_host }}"
+    master_user: "{{ ubuntu_1604_mariadb_replication_user_name }}"
+    master_password: "{{ ubuntu_1604_mariadb_replication_user_password }}"
+  when:
+    slave2_information.Master_Host is not defined and
+    inventory_hostname in ubuntu_1604_mariadb_replication_master2_host
+
+- name: configure | start slave on master2
+  mysql_replication:
+    mode: startslave
+  when:
+    slave2_information.Master_Host is not defined and
+    inventory_hostname in ubuntu_1604_mariadb_replication_master2_host
+
+- name: configure | check slave status on master2
+  mysql_replication:
+    mode: getslave
+  register: slave2_information
+  when: inventory_hostname in ubuntu_1604_mariadb_replication_master2_host
+  failed_when: slave2_information.Slave_IO_Running != 'Yes' or slave2_information.Slave_SQL_Running != 'Yes'
+
+- name: configure | get slave on master1
+  mysql_replication:
+    mode: getslave
+  register: slave1_information
+  when: inventory_hostname in ubuntu_1604_mariadb_replication_master1_host
+
+- name: configure | change master on master1
+  mysql_replication:
+    mode: changemaster
+    master_host: "{{ ubuntu_1604_mariadb_replication_master2_host }}"
+    master_user: "{{ ubuntu_1604_mariadb_replication_user_name }}"
+    master_password: "{{ ubuntu_1604_mariadb_replication_user_password }}"
+  when:
+    slave1_information.Master_Host is not defined and
+    inventory_hostname in ubuntu_1604_mariadb_replication_master1_host
+
+- name: configure | start slave on master1
+  mysql_replication:
+    mode: startslave
+  when:
+    slave1_information.Master_Host is not defined and
+    inventory_hostname in ubuntu_1604_mariadb_replication_master1_host
+
+- name: configure | check slave status on master1
+  mysql_replication:
+    mode: getslave
+  register: slave1_information
+  when: inventory_hostname in ubuntu_1604_mariadb_replication_master1_host
+  failed_when: slave1_information.Slave_IO_Running != 'Yes' or slave1_information.Slave_SQL_Running != 'Yes'

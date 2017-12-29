@@ -1,0 +1,6 @@
+# tasks file for ubuntu-1604-mariadb-replication
+---
+
+- include: install.yml
+
+- include: configure.yml

@@ -1,0 +1,6 @@
+# tasks file for ubuntu-1604-mariadb-replication
+---
+- name: install | dependencies
+  apt:
+    name: "{{ item }}"
+  with_items: "{{ ubuntu_1604_mariadb_replication_dependencies }}"

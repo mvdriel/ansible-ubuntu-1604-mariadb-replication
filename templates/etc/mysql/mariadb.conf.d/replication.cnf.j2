@@ -1,0 +1,11 @@
+# {{ ansible_managed }}
+
+[mysqld]
+server-id = {{ ubuntu_1604_mariadb_replication_server_id }}
+log_bin = mysql-bin
+log_bin_index = mysql-bin.index
+#sync-binlog = 1
+sync-binlog = 0
+relay_log = mysql-relay
+relay_log_index = mysql-relay.index
+skip-slave-start

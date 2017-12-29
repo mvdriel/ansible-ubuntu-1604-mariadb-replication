@@ -1,0 +1,9 @@
+# test file for ubuntu-1604-mariadb-replication
+---
+- hosts: all
+  remote_user: vagrant
+  become: true
+  roles:
+    - ../../
+  vars:
+    ubuntu_1604_mariadb_replication_user_password: 'this-is-a-test-password'

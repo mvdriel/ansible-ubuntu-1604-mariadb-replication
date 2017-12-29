@@ -1,0 +1,4 @@
+# vars file for ubuntu-1604-mariadb-replication
+---
+ubuntu_1604_mariadb_replication_dependencies:
+  - python-mysqldb
