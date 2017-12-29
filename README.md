@@ -1,5 +1,12 @@
 ## ubuntu-1604-mariadb-replication
 
+Set up master-master replication for MariaDB server on Ubuntu 16.04.
+
+#### Requirements
+
+* `python-mysqldb` (will be installed)
+* `mariadb-server` (will not be installed)
+
 #### Variables
 
 * `ubuntu_1604_mariadb_replication_server_id`: [required]: Server-id
